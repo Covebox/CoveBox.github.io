@@ -33,43 +33,133 @@
 
         const tilesetImage = new Image();
         const spriteSheetImage = new Image();
-        tilesetImage.src = 'tileset.png';
-        spriteSheetImage.src = 'spritesheet.png';
+        tilesetImage.src = 'tileset.png'; // Pfad zu deinem Tileset
+        spriteSheetImage.src = 'spritesheet.png'; // Pfad zu deinem Spritesheet
 
         const tileSize = 16;
         const spriteWidth = 16;
         const spriteHeight = 16;
 
+        // Tile-Definitionen
+        const tileDefinitions = {
+            grass: { coords: [2, 0], passable: true },
+            stone: { coords: [1, 0], passable: true },
+            wall:  { coords: [2, 0], passable: false },
+            // ... weitere Tiles ...
+        };
+
+        const groundArray = [
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+        ];
+
+        const worldHeight = groundArray.length;
+        const worldWidth = groundArray.reduce((max, row) => Math.max(max, row.length), 0);
+
         let playerX = 100;
         let playerY = 100;
         const playerSpeed = 2;
 
-		// Definition der Tile-Koordinaten im Tileset
-		const tileDefinitions = {
-			grass: [0, 0], // Grass Tile ist bei [0,0]
-			stone: [1, 0], // Stone Tile ist bei [1,0]
-			// ... weitere Tile-Definitionen ...
-		};
+        // Kamera-Position
+        let cameraX = 0;
+        let cameraY = 0;
 
-		// Boden-Array, jetzt mit den Schlüsselwörtern für jedes Tile
-		const groundArray = [
-			['grass', 'stone', 'grass', 'grass', 'grass', 'grass'],
-			['stone', 'grass', 'stone'],
-			// ... weitere Zeilen ...
-		];
-		
-        // Animationsdefinitionen
-        const animations = {
-            idle: { frames: [[0, 0], [16, 0], [32, 0]], delay: 500 },
-            walk: { frames: [[0, 16], [16, 16], [32, 16]], delay: 200 }
-            // weitere Animationen hier hinzufügen
-        };
+        function isPassable(x, y) {
+            if (x < 0 || y < 0 || x >= worldWidth || y >= worldHeight) {
+                return false; // Verhindere das Verlassen der Weltgrenzen
+            }
+            const tileType = groundArray[y][x];
+            return tileDefinitions[tileType].passable;
+        }
 
-        let currentAnimation = 'idle';
-        let currentFrame = 0;
-        let frameTimer = 0;
+        function updatePlayerPosition() {
+            let newX = playerX;
+            let newY = playerY;
 
-        // Tastenstatus
+            if (keys.w) newY -= playerSpeed;
+            if (keys.a) newX -= playerSpeed;
+            if (keys.s) newY += playerSpeed;
+            if (keys.d) newX += playerSpeed;
+
+            // Prüfe auf Kollisionen
+            if (isPassable(Math.floor(newX / tileSize), Math.floor(newY / tileSize))) {
+                playerX = newX;
+                playerY = newY;
+            }
+        }
+
+		function updateCamera() {
+			// Zentriere die Kamera auf dem Spieler, aber begrenze sie innerhalb der Weltgrenzen
+			cameraX = Math.min(Math.max(playerX - canvas.width / 2, 0), (worldWidth * tileSize) - canvas.width);
+			cameraY = Math.min(Math.max(playerY - canvas.height / 2, 0), (worldHeight * tileSize) - canvas.height);
+
+			// Runde die Kameraposition auf die nächste ganze Zahl
+			cameraX = Math.round(Math.max(0, cameraX));
+			cameraY = Math.round(Math.max(0, cameraY));
+		}
+
+		function drawGame() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			const startCol = Math.max(Math.floor(cameraX / tileSize), 0);
+			const endCol = Math.min(startCol + (canvas.width / tileSize), worldWidth);
+			const startRow = Math.max(Math.floor(cameraY / tileSize), 0);
+			const endRow = Math.min(startRow + (canvas.height / tileSize), worldHeight);
+			const offsetX = -cameraX + startCol * tileSize;
+			const offsetY = -cameraY + startRow * tileSize;
+
+			for (let y = startRow; y < endRow+1; y++) {
+				for (let x = startCol; x < endCol+1; x++) {
+					if (y < groundArray.length && x < groundArray[y].length) {
+						const tile = groundArray[y][x];
+						const tileCoords = tileDefinitions[tile].coords;
+						ctx.drawImage(tilesetImage, tileCoords[0] * tileSize, tileCoords[1] * tileSize, tileSize, tileSize, (x - startCol) * tileSize + offsetX, (y - startRow) * tileSize + offsetY, tileSize, tileSize);
+					}
+				}
+			}
+			
+			// Zeichne die Spielfigur
+			ctx.drawImage(spriteSheetImage, 0, 0, spriteWidth, spriteHeight, playerX - cameraX, playerY - cameraY, spriteWidth, spriteHeight);
+		}
+
+
         const keys = {
             w: false,
             a: false,
@@ -88,59 +178,15 @@
                 keys[event.key] = false;
             }
         });
-        function updatePlayerPosition() {
-            if (keys.w) playerY -= playerSpeed;
-            if (keys.a) playerX -= playerSpeed;
-            if (keys.s) playerY += playerSpeed;
-            if (keys.d) playerX += playerSpeed;
 
-            // Aktualisiere die Animation basierend auf der Bewegung
-            if (keys.w || keys.a || keys.s || keys.d) {
-                currentAnimation = 'walk';
-            } else {
-                currentAnimation = 'idle';
-            }
-        }
+		function gameLoop() {
+			updatePlayerPosition();
+			updateCamera();
+			drawGame();
+			requestAnimationFrame(gameLoop);
+		}
 
-        function updateAnimationFrame(deltaTime) {
-            frameTimer += deltaTime;
-            if (frameTimer > animations[currentAnimation].delay) {
-                currentFrame = (currentFrame + 1) % animations[currentAnimation].frames.length;
-                frameTimer = 0;
-            }
-        }
-
-        function drawGame(deltaTime) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-			for (let y = 0; y < groundArray.length; y++) {
-				for (let x = 0; x < groundArray[y].length; x++) {
-					const tileType = groundArray[y][x];
-					const tileCoords = tileDefinitions[tileType];
-					ctx.drawImage(tilesetImage, tileCoords[0] * tileSize, tileCoords[1] * tileSize, tileSize, tileSize, x * tileSize, y * tileSize, tileSize, tileSize);
-				}
-			}
-
-            // Aktuelle Frame-Koordinaten
-            let frameX = animations[currentAnimation].frames[currentFrame][0];
-            let frameY = animations[currentAnimation].frames[currentFrame][1];
-
-            // Zeichne die Spielfigur mit dem aktuellen Frame
-            ctx.drawImage(spriteSheetImage, frameX, frameY, spriteWidth, spriteHeight, playerX, playerY, spriteWidth, spriteHeight);
-        }
-
-        let lastTime = 0;
-        function gameLoop(timestamp) {
-            let deltaTime = timestamp - lastTime;
-            lastTime = timestamp;
-
-            updatePlayerPosition();
-            updateAnimationFrame(deltaTime);
-            drawGame(deltaTime);
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        tilesetImage.onload = spriteSheetImage.onload = () => requestAnimationFrame(gameLoop);
+		tilesetImage.onload = spriteSheetImage.onload = () => requestAnimationFrame(gameLoop);
     </script>
 </body>
 </html>
