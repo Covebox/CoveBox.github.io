@@ -33,50 +33,42 @@
 
         const tilesetImage = new Image();
         const spriteSheetImage = new Image();
-        tilesetImage.src = './tileset.png';
-        spriteSheetImage.src = './spritesheet.png';
+        tilesetImage.src = 'tileset.png';
+        spriteSheetImage.src = 'spritesheet.png';
 
         const tileSize = 16;
         const spriteWidth = 16;
         const spriteHeight = 16;
 
-        // Spielerposition
         let playerX = 100;
         let playerY = 100;
+        const playerSpeed = 2;
 
-        // Geschwindigkeit der Spielfigur
-        const playerSpeed = 1;
+		// Definition der Tile-Koordinaten im Tileset
+		const tileDefinitions = {
+			grass: [0, 0], // Grass Tile ist bei [0,0]
+			stone: [1, 0], // Stone Tile ist bei [1,0]
+			// ... weitere Tile-Definitionen ...
+		};
 
-        // Boden-Grid Array
-        const groundArray = [
-            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-            // ... weitere Zeilen
-        ];
-
-        // Zeichne das Spiel
-        function drawGame() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Zeichne den Boden
-            for (let y = 0; y < groundArray.length; y++) {
-                for (let x = 0; x < groundArray[y].length; x++) {
-                    const tile = groundArray[y][x];
-                    ctx.drawImage(tilesetImage, tile * tileSize, 0, tileSize, tileSize, x * tileSize, y * tileSize, tileSize, tileSize);
-                }
-            }
-
-            // Zeichne die Spielfigur
-            ctx.drawImage(spriteSheetImage, 0, 0, spriteWidth, spriteHeight, playerX, playerY, spriteWidth, spriteHeight);
-        }
+		// Boden-Array, jetzt mit den Schlüsselwörtern für jedes Tile
+		const groundArray = [
+			['grass', 'stone', 'grass', 'grass', 'grass', 'grass'],
+			['stone', 'grass', 'stone'],
+			// ... weitere Zeilen ...
+		];
 		
+        // Animationsdefinitionen
+        const animations = {
+            idle: { frames: [[0, 0], [16, 0], [32, 0]], delay: 500 },
+            walk: { frames: [[0, 16], [16, 16], [32, 16]], delay: 200 }
+            // weitere Animationen hier hinzufügen
+        };
+
+        let currentAnimation = 'idle';
+        let currentFrame = 0;
+        let frameTimer = 0;
+
         // Tastenstatus
         const keys = {
             w: false,
@@ -85,34 +77,70 @@
             d: false
         };
 
-        function updatePlayerPosition() {
-            if (keys.w) playerY -= playerSpeed;
-            if (keys.a) playerX -= playerSpeed;
-            if (keys.s) playerY += playerSpeed;
-            if (keys.d) playerX += playerSpeed;
-        }
-
-        function gameLoop() {
-            updatePlayerPosition(); // Aktualisiere Spielerposition
-            drawGame();             // Zeichne das Spiel
-            requestAnimationFrame(gameLoop); // Wiederhole den Loop
-        }
-
-        // Event-Listener für Tastendrücke
         document.addEventListener('keydown', function(event) {
             if (event.key in keys) {
                 keys[event.key] = true;
             }
         });
 
-        // Event-Listener für das Loslassen der Tasten
         document.addEventListener('keyup', function(event) {
             if (event.key in keys) {
                 keys[event.key] = false;
             }
         });
+        function updatePlayerPosition() {
+            if (keys.w) playerY -= playerSpeed;
+            if (keys.a) playerX -= playerSpeed;
+            if (keys.s) playerY += playerSpeed;
+            if (keys.d) playerX += playerSpeed;
 
-        tilesetImage.onload = spriteSheetImage.onload = gameLoop;
+            // Aktualisiere die Animation basierend auf der Bewegung
+            if (keys.w || keys.a || keys.s || keys.d) {
+                currentAnimation = 'walk';
+            } else {
+                currentAnimation = 'idle';
+            }
+        }
+
+        function updateAnimationFrame(deltaTime) {
+            frameTimer += deltaTime;
+            if (frameTimer > animations[currentAnimation].delay) {
+                currentFrame = (currentFrame + 1) % animations[currentAnimation].frames.length;
+                frameTimer = 0;
+            }
+        }
+
+        function drawGame(deltaTime) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+			for (let y = 0; y < groundArray.length; y++) {
+				for (let x = 0; x < groundArray[y].length; x++) {
+					const tileType = groundArray[y][x];
+					const tileCoords = tileDefinitions[tileType];
+					ctx.drawImage(tilesetImage, tileCoords[0] * tileSize, tileCoords[1] * tileSize, tileSize, tileSize, x * tileSize, y * tileSize, tileSize, tileSize);
+				}
+			}
+
+            // Aktuelle Frame-Koordinaten
+            let frameX = animations[currentAnimation].frames[currentFrame][0];
+            let frameY = animations[currentAnimation].frames[currentFrame][1];
+
+            // Zeichne die Spielfigur mit dem aktuellen Frame
+            ctx.drawImage(spriteSheetImage, frameX, frameY, spriteWidth, spriteHeight, playerX, playerY, spriteWidth, spriteHeight);
+        }
+
+        let lastTime = 0;
+        function gameLoop(timestamp) {
+            let deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+
+            updatePlayerPosition();
+            updateAnimationFrame(deltaTime);
+            drawGame(deltaTime);
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        tilesetImage.onload = spriteSheetImage.onload = () => requestAnimationFrame(gameLoop);
     </script>
 </body>
 </html>
