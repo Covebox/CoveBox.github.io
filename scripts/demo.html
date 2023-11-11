@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tileset und Spritesheet Demo</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        #gameCanvas {
+            image-rendering: pixelated; /* Scharfe Pixel */
+            width: auto; /* Breite automatisch basierend auf Höhe */
+            height: 80vh; /* Höhe auf 80% der Viewport-Höhe setzen */
+            max-width: 100%; /* Maximal 100% der Fensterbreite */
+            max-height: 100%; /* Maximal 100% der Fensterhöhe */
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+
+        canvas.width = 240;
+        canvas.height = 135;
+
+        const tilesetImage = new Image();
+        const spriteSheetImage = new Image();
+        tilesetImage.src = './tileset.png';
+        spriteSheetImage.src = './spritesheet.png';
+
+        const tileSize = 16;
+        const spriteWidth = 16;
+        const spriteHeight = 16;
+
+        // Spielerposition
+        let playerX = 100;
+        let playerY = 100;
+
+        // Geschwindigkeit der Spielfigur
+        const playerSpeed = 1;
+
+        // Boden-Grid Array
+        const groundArray = [
+            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            // ... weitere Zeilen
+        ];
+
+        // Zeichne das Spiel
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Zeichne den Boden
+            for (let y = 0; y < groundArray.length; y++) {
+                for (let x = 0; x < groundArray[y].length; x++) {
+                    const tile = groundArray[y][x];
+                    ctx.drawImage(tilesetImage, tile * tileSize, 0, tileSize, tileSize, x * tileSize, y * tileSize, tileSize, tileSize);
+                }
+            }
+
+            // Zeichne die Spielfigur
+            ctx.drawImage(spriteSheetImage, 0, 0, spriteWidth, spriteHeight, playerX, playerY, spriteWidth, spriteHeight);
+        }
+		
+        // Tastenstatus
+        const keys = {
+            w: false,
+            a: false,
+            s: false,
+            d: false
+        };
+
+        function updatePlayerPosition() {
+            if (keys.w) playerY -= playerSpeed;
+            if (keys.a) playerX -= playerSpeed;
+            if (keys.s) playerY += playerSpeed;
+            if (keys.d) playerX += playerSpeed;
+        }
+
+        function gameLoop() {
+            updatePlayerPosition(); // Aktualisiere Spielerposition
+            drawGame();             // Zeichne das Spiel
+            requestAnimationFrame(gameLoop); // Wiederhole den Loop
+        }
+
+        // Event-Listener für Tastendrücke
+        document.addEventListener('keydown', function(event) {
+            if (event.key in keys) {
+                keys[event.key] = true;
+            }
+        });
+
+        // Event-Listener für das Loslassen der Tasten
+        document.addEventListener('keyup', function(event) {
+            if (event.key in keys) {
+                keys[event.key] = false;
+            }
+        });
+
+        tilesetImage.onload = spriteSheetImage.onload = gameLoop;
+    </script>
+</body>
+</html>
