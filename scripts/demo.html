@@ -42,52 +42,42 @@
 
         // Tile-Definitionen
         const tileDefinitions = {
-            grass: { coords: [2, 0], passable: true },
+            grass: { coords: [0, 0], passable: true },
             stone: { coords: [1, 0], passable: true },
             wall:  { coords: [2, 0], passable: false },
             // ... weitere Tiles ...
         };
 
         const groundArray = [
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
-            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","wall","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"],
+            ["grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass","grass"]
         ];
 
         const worldHeight = groundArray.length;
@@ -95,70 +85,94 @@
 
         let playerX = 100;
         let playerY = 100;
-        const playerSpeed = 2;
+        const playerSpeed = .5;
+
+        // Definiere die Hitbox
+        const hitbox = {
+            width: 12,
+            height: 12,
+            offsetX: 2,
+            offsetY: 2
+        };
 
         // Kamera-Position
         let cameraX = 0;
         let cameraY = 0;
 
-        function isPassable(x, y) {
+        function isTilePassable(x, y) {
             if (x < 0 || y < 0 || x >= worldWidth || y >= worldHeight) {
-                return false; // Verhindere das Verlassen der Weltgrenzen
+                return false;
             }
             const tileType = groundArray[y][x];
             return tileDefinitions[tileType].passable;
+        }
+
+        function isPassable(x, y) {
+            const left = x + hitbox.offsetX;
+            const right = left + hitbox.width;
+            const top = y + hitbox.offsetY;
+            const bottom = top + hitbox.height;
+
+            return !(
+                !isTilePassable(Math.floor(left / tileSize), Math.floor(top / tileSize)) ||
+                !isTilePassable(Math.floor(right / tileSize), Math.floor(top / tileSize)) ||
+                !isTilePassable(Math.floor(left / tileSize), Math.floor(bottom / tileSize)) ||
+                !isTilePassable(Math.floor(right / tileSize), Math.floor(bottom / tileSize))
+            );
         }
 
         function updatePlayerPosition() {
             let newX = playerX;
             let newY = playerY;
 
-            if (keys.w) newY -= playerSpeed;
             if (keys.a) newX -= playerSpeed;
             if (keys.s) newY += playerSpeed;
             if (keys.d) newX += playerSpeed;
+            if (keys.w) newY -= playerSpeed;
 
             // Prüfe auf Kollisionen
-            if (isPassable(Math.floor(newX / tileSize), Math.floor(newY / tileSize))) {
+            if (isPassable(newX, newY)) {
                 playerX = newX;
                 playerY = newY;
             }
+			else{
+                playerX = Math.floor(playerX);
+                playerY = Math.floor(playerY);
+			}
         }
 
-		function updateCamera() {
-			// Zentriere die Kamera auf dem Spieler, aber begrenze sie innerhalb der Weltgrenzen
-			cameraX = Math.min(Math.max(playerX - canvas.width / 2, 0), (worldWidth * tileSize) - canvas.width);
-			cameraY = Math.min(Math.max(playerY - canvas.height / 2, 0), (worldHeight * tileSize) - canvas.height);
+        function updateCamera() {
+            cameraX = Math.min(Math.max(playerX - canvas.width / 2, 0), (worldWidth * tileSize) - canvas.width);
+            cameraY = Math.min(Math.max(playerY - canvas.height / 2, 0), (worldHeight * tileSize) - canvas.height);
 
-			// Runde die Kameraposition auf die nächste ganze Zahl
-			cameraX = Math.round(Math.max(0, cameraX));
-			cameraY = Math.round(Math.max(0, cameraY));
-		}
+            // Runde die Kameraposition auf die nächste ganze Zahl
+            cameraX = Math.round(Math.max(0, cameraX));
+            cameraY = Math.round(Math.max(0, cameraY));
+        }
 
-		function drawGame() {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-			const startCol = Math.max(Math.floor(cameraX / tileSize), 0);
-			const endCol = Math.min(startCol + (canvas.width / tileSize), worldWidth);
-			const startRow = Math.max(Math.floor(cameraY / tileSize), 0);
-			const endRow = Math.min(startRow + (canvas.height / tileSize), worldHeight);
-			const offsetX = -cameraX + startCol * tileSize;
-			const offsetY = -cameraY + startRow * tileSize;
+            const startCol = Math.max(Math.floor(cameraX / tileSize), 0);
+            const endCol = Math.min(startCol + (canvas.width / tileSize), worldWidth);
+            const startRow = Math.max(Math.floor(cameraY / tileSize), 0);
+            const endRow = Math.min(startRow + (canvas.height / tileSize), worldHeight);
+            const offsetX = -cameraX + startCol * tileSize;
+            const offsetY = -cameraY + startRow * tileSize;
 
-			for (let y = startRow; y < endRow+1; y++) {
-				for (let x = startCol; x < endCol+1; x++) {
-					if (y < groundArray.length && x < groundArray[y].length) {
-						const tile = groundArray[y][x];
-						const tileCoords = tileDefinitions[tile].coords;
-						ctx.drawImage(tilesetImage, tileCoords[0] * tileSize, tileCoords[1] * tileSize, tileSize, tileSize, (x - startCol) * tileSize + offsetX, (y - startRow) * tileSize + offsetY, tileSize, tileSize);
-					}
-				}
-			}
-			
-			// Zeichne die Spielfigur
-			ctx.drawImage(spriteSheetImage, 0, 0, spriteWidth, spriteHeight, playerX - cameraX, playerY - cameraY, spriteWidth, spriteHeight);
-		}
+            for (let y = startRow; y < endRow+1; y++) {
+                for (let x = startCol; x < endCol+1; x++) {
+                    if (y < groundArray.length && x < groundArray[y].length) {
+                        const tile = groundArray[y][x];
+                        const tileCoords = tileDefinitions[tile].coords;
+                        ctx.drawImage(tilesetImage, tileCoords[0] * tileSize, tileCoords[1] * tileSize, tileSize, tileSize, (x - startCol) * tileSize + offsetX, (y - startRow) * tileSize + offsetY, tileSize, tileSize);
+                    }
+                }
+            }
 
+            // Zeichne die Spielfigur
+            ctx.drawImage(spriteSheetImage, 0, 0, spriteWidth, spriteHeight, playerX - cameraX, playerY - cameraY, spriteWidth, spriteHeight);
+        }
 
         const keys = {
             w: false,
@@ -179,14 +193,14 @@
             }
         });
 
-		function gameLoop() {
-			updatePlayerPosition();
-			updateCamera();
-			drawGame();
-			requestAnimationFrame(gameLoop);
-		}
+        function gameLoop() {
+            updatePlayerPosition();
+            updateCamera();
+            drawGame();
+            requestAnimationFrame(gameLoop);
+        }
 
-		tilesetImage.onload = spriteSheetImage.onload = () => requestAnimationFrame(gameLoop);
+        tilesetImage.onload = spriteSheetImage.onload = () => requestAnimationFrame(gameLoop);
     </script>
 </body>
 </html>
