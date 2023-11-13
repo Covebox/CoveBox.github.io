@@ -28,8 +28,8 @@
         const ctx = canvas.getContext('2d');
         ctx.imageSmoothingEnabled = false;
 
-        canvas.width = 240;
-        canvas.height = 135;
+        canvas.width = 240*1.5;
+        canvas.height = 135*1.5;
 
         const tilesetImage = new Image();
         const spriteSheetImage = new Image();
@@ -38,11 +38,11 @@
 
         const tileSize = 16;
         const spriteWidth = 16;
-        const spriteHeight = 16;
+        const spriteHeight = 24;
 
         // Tile-Definitionen
         const tileDefinitions = {
-            grass: { coords: [0, 0], passable: true },
+            grass: { coords: [1, 1], passable: true },
             stone: { coords: [1, 0], passable: true },
             wall:  { coords: [2, 0], passable: false },
             // ... weitere Tiles ...
@@ -89,10 +89,10 @@
 
         // Definiere die Hitbox
         const hitbox = {
-            width: 12,
-            height: 12,
-            offsetX: 2,
-            offsetY: 2
+            width: 8,
+            height: 4,
+            offsetX: 4,
+            offsetY: 20
         };
 
         // Kamera-Position
@@ -121,23 +121,60 @@
             );
         }
 
-        function updatePlayerPosition() {
-            let newX = playerX;
-            let newY = playerY;
+		let playerDirection = 'right'; // 'right' oder 'left'
+		
+		// Animationen für den Sprite
+		const animations = {
+			idleDown: { frames: [[0, 0], [16, 0], [32, 0], [48, 0], [64, 0]], delay: 160 },
+			idleRight: { frames: [[0, 48], [16, 48], [32, 48], [48, 48], [64, 48]], delay: 160 },
+			idleLeft: { frames: [[0, 48*2], [16, 48*2], [32, 48*2], [48, 48*2], [64, 48*2]], delay: 160 },
+			idleUp: { frames: [[0, 48*3], [16, 48*3], [32, 48*3], [48, 48*3], [64, 48*3]], delay: 160 },
+			walkDown: { frames: [[0, 24], [16, 24], [32, 24], [48, 24], [64, 24]], delay: 100 },
+			walkRight: { frames: [[0, 24+48], [16, 24+48], [32, 24+48], [48, 24+48], [64, 24+48]], delay: 100 },
+			walkLeft: { frames: [[0, 24+48*2], [16, 24+48*2], [32, 24+48*2], [48, 24+48*2], [64, 24+48*2]], delay: 100 },
+			walkUp: { frames: [[0, 24+48*3], [16, 24+48*3], [32, 24+48*3], [48, 24+48*3], [64, 24+48*3]], delay: 100 },
+			// ... weitere Animationen ...
+		};
 
-            if (keys.a) newX -= playerSpeed;
-            if (keys.s) newY += playerSpeed;
-            if (keys.d) newX += playerSpeed;
-            if (keys.w) newY -= playerSpeed;
+		let currentAnimation = 'idleDown';
+		let currentFrame = 0;
+		let frameTimer = 0;
+		let lastDirection = 'down';
 
-            // Prüfe auf Kollisionen
-            if (isPassable(newX, newY)) {
-                playerX = newX;
-                playerY = newY;
-            }
+
+		function updateAnimationFrame(deltaTime) {
+			console.log(currentAnimation)
+			frameTimer += deltaTime;
+			if (frameTimer > animations[currentAnimation].delay) {
+				currentFrame = (currentFrame + 1) % animations[currentAnimation].frames.length;
+				frameTimer = 0;
+			}
+		}
+
+		function updatePlayerPosition() {
+			let newX = playerX;
+			let newY = playerY;
+			let moving = false;
+
+			if (keys.w) { newY -= playerSpeed; moving = true; lastDirection = 'up'; }
+			if (keys.a) { newX -= playerSpeed; moving = true; lastDirection = 'left'; }
+			if (keys.s) { newY += playerSpeed; moving = true; lastDirection = 'down'; }
+			if (keys.d) { newX += playerSpeed; moving = true; lastDirection = 'right'; }
+
+
+			if (isPassable(newX, newY)) {
+				playerX = newX;
+				playerY = newY;
+			}
 			else{
                 playerX = Math.floor(playerX);
                 playerY = Math.floor(playerY);
+			}
+			
+			if (moving) {
+				currentAnimation = 'walk' + lastDirection.charAt(0).toUpperCase() + lastDirection.slice(1);
+			} else {
+				currentAnimation = 'idle' + lastDirection.charAt(0).toUpperCase() + lastDirection.slice(1);
 			}
         }
 
@@ -162,16 +199,19 @@
 
             for (let y = startRow; y < endRow+1; y++) {
                 for (let x = startCol; x < endCol+1; x++) {
-                    if (y < groundArray.length && x < groundArray[y].length) {
-                        const tile = groundArray[y][x];
-                        const tileCoords = tileDefinitions[tile].coords;
-                        ctx.drawImage(tilesetImage, tileCoords[0] * tileSize, tileCoords[1] * tileSize, tileSize, tileSize, (x - startCol) * tileSize + offsetX, (y - startRow) * tileSize + offsetY, tileSize, tileSize);
-                    }
+					if (y < groundArray.length && x < groundArray[y].length) {
+						const tile = groundArray[y][x];
+						const tileCoords = tileDefinitions[tile].coords;
+						ctx.drawImage(tilesetImage, tileCoords[0] * tileSize, tileCoords[1] * tileSize, tileSize, tileSize, (x - startCol) * tileSize + offsetX, (y - startRow) * tileSize + offsetY, tileSize, tileSize);
+					}
                 }
             }
+			
+			let frameX = animations[currentAnimation].frames[currentFrame][0];
+			let frameY = animations[currentAnimation].frames[currentFrame][1];
 
-            // Zeichne die Spielfigur
-            ctx.drawImage(spriteSheetImage, 0, 0, spriteWidth, spriteHeight, playerX - cameraX, playerY - cameraY, spriteWidth, spriteHeight);
+			// Zeichne die Spielfigur mit dem aktuellen Frame
+			ctx.drawImage(spriteSheetImage, frameX, frameY, spriteWidth, spriteHeight, Math.floor(playerX - cameraX), Math.floor(playerY - cameraY), spriteWidth, spriteHeight);
         }
 
         const keys = {
@@ -193,12 +233,19 @@
             }
         });
 
-        function gameLoop() {
-            updatePlayerPosition();
-            updateCamera();
-            drawGame();
-            requestAnimationFrame(gameLoop);
-        }
+		function gameLoop(timestamp) {
+			let deltaTime = timestamp - lastTime;
+			lastTime = timestamp;
+
+			updatePlayerPosition();
+			updateAnimationFrame(deltaTime);
+			drawGame();
+
+			requestAnimationFrame(gameLoop);
+		}
+
+		let lastTime = 0;
+		requestAnimationFrame(gameLoop);
 
         tilesetImage.onload = spriteSheetImage.onload = () => requestAnimationFrame(gameLoop);
     </script>
