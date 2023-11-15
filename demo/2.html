@@ -85,6 +85,10 @@ function drawGame(){
 	//ctx.strokeRect(rect2.x,rect2.y,rect2.width,rect2.height)
 	
 	ctx.font = '20px courier new';
+
+	ctx.fillStyle = "black"
+	ctx.fillText("velocity x2: " + (rect2.vx), 10, canvas.height - 90)
+
 	ctx.fillStyle = rect1.x < rect2.x + rect2.width ? "blue" : "red"
 	ctx.fillText("x1 > x2 + x2.width: " + (rect1.x < rect2.x + rect2.width), 10, canvas.height - 70)
 	
