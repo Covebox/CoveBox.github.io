@@ -1,0 +1,237 @@
+<html>
+<head>
+<style>
+body {
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#game {
+    background-color: white;
+    border: 1px solid black;
+}
+
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+</body>
+<script>
+rects = []
+pipes = []
+
+class Rect{
+	constructor(opt = {}){
+		this.x = 0
+		this.y = 0
+		this.width = 0
+		this.height = 0
+		this.vx = 0
+		this.vy = 0
+		this.ax = 0
+		this.ay = 0
+		this.fill = 0
+		this.type = "rect"
+		
+		this.index = rects.length
+		rects.push(this)
+		this.targetIndex = 0
+		
+		this.readOpt(opt)
+	}
+	readOpt(opt = {}){
+		for( let key in opt ){
+			this[key] = opt[key]
+		}
+	}
+	tick(){
+		this.vx += this.ax
+		this.vy += this.ay
+		this.x += this.vx
+		this.y += this.vy
+	}
+	draw(){
+		if( this.fill ){
+			ctx.fillStyle = this.fill
+			ctx.fillRect(this.x, this.y, this.width, this.height)
+		}
+		
+		var r1 = this
+		var r2 = rects[this.targetIndex]
+		
+	    ctx.beginPath()
+		ctx.strokeStyle = r1.y < r2.y + r2.height ? "blue" : "red"
+		ctx.moveTo(r1.x, r1.y)
+		ctx.lineTo(r1.x + r1.width, r1.y)
+		ctx.stroke()
+		
+		ctx.beginPath()
+		ctx.strokeStyle = r2.y < r1.y + r1.height ? "blue" : "red"
+		ctx.moveTo(r1.x, r1.y + r1.height)
+		ctx.lineTo(r1.x + r1.width, r1.y + r1.height)
+		ctx.stroke()
+		
+		ctx.beginPath()
+		ctx.strokeStyle = r1.x < r2.x + r2.width ? "blue" : "red"
+		ctx.moveTo(r1.x, r1.y)
+		ctx.lineTo(r1.x, r1.y + r1.height)
+		ctx.stroke()
+		
+		ctx.beginPath()
+		ctx.strokeStyle = r2.x < r1.x + r1.width ? "blue" : "red"
+		ctx.moveTo(r1.x + r1.width, r1.y)
+		ctx.lineTo(r1.x + r1.width, r1.y + r1.height)
+		ctx.stroke()
+	}
+	hasCollisionWith(rect){
+		return this.x < rect.x + rect.width && this.y < rect.y + rect.height && rect.x < this.x + this.width && rect.y < this.y + this.height
+	}
+	hasCollisionWithType(type){
+		for(var rect of rects){
+			if( rect.type == type && this.hasCollisionWith(rect) ){
+				return true
+			}
+		}
+		return false
+	}
+}
+
+
+canvas = document.getElementById("game")
+ctx = canvas.getContext("2d")
+canvas.width = 16*32*1.5
+canvas.height = 9*32*1.5
+gravity = .2
+
+rect2 = new Rect({
+	x: 300,
+	y: 150,
+	width: 50,
+	height: 50,
+	vx: 0,
+	vy: 0,
+	ay: .2
+})
+rect2.tick = function() {
+	this.vx += this.ax
+	this.vy += this.ay
+	this.x += this.vx
+	this.y += this.vy
+	if( this.hasCollisionWithType("pipe") ){
+		this.fill = "red"
+	}
+}
+
+rect1 = new Rect({
+	x: 50,
+	y: 70,
+	width: 50,
+	height: 50,
+	vx: 0,
+	vy: 0
+})
+
+rect1.targetIndex = rect2.index
+
+
+
+canvas.addEventListener('mousemove', function(event) {
+	var pos = canvas.getBoundingClientRect()
+	rect1.x = event.clientX - pos.left - rect1.width/2
+	rect1.y = event.clientY - pos.top - rect1.height/2
+});
+
+canvas.addEventListener('mousedown', function(event) {
+	rect2.vy = -5
+});
+
+document.addEventListener('keydown', function(event) {
+	if (event.code === 'Space') {
+		var lucke = (Math.random()*canvas.height-100)+200
+		console.log(lucke)
+		new Rect({
+			x: canvas.width,
+			y: lucke,
+			width: 100,
+			height: canvas.height,
+			vx: -3,
+			vy: 0,
+			type: "pipe"
+		})
+		new Rect({
+			x: canvas.width,
+			y: 0,
+			width: 100,
+			height: lucke-200,
+			vx: -3,
+			vy: 0,
+			type: "pipe"
+		})
+	}
+})
+
+function drawGame(){
+	ctx.font = '20px courier new'
+	ctx.fillText("gravity: " + (gravity), 10, canvas.height - 30)
+	ctx.fillText("velocity y2: " + Math.round(rect2.vy), 10, canvas.height - 10)
+}
+
+function cubelogic(r, c){
+	r.y += r.vy
+	if(collisionBetween(r,c)){
+		if( r.vy > 0 ){
+			while(collisionBetween(r,c)){
+				r.y--
+			}
+		}
+		else{
+			while(collisionBetween(r,c)){
+				r.y++
+			}
+		}
+		r.vy = 0
+		r.vx *= .9
+	}
+	r.x += r.vx
+	if(collisionBetween(r,c)){
+		if( r.vx > 0 ){
+			while(collisionBetween(r,c)){
+				r.x--
+			}
+		}
+		else{
+			while(collisionBetween(r,c)){
+				r.x++
+			}
+		}
+		r.vx *= -1
+	}
+	
+	r.vy += gravity
+	if(r.y + r.height >= canvas.height){
+		while(r.y + r.height > canvas.height){
+			r.y--
+		}
+		r.vy = 0
+		r.vx *= .9
+	}
+}
+
+function collisionBetween(a, b){
+	return a.x < b.x + b.width && a.y < b.y + b.height && b.x < a.x + a.width && b.y < a.y + a.height
+}
+
+function gameLoop(timestamp) {
+	ctx.clearRect(0,0,canvas.width,canvas.height)
+	rects.forEach(e => e.tick())
+	rects.forEach(e => e.draw())
+	drawGame()
+	requestAnimationFrame(gameLoop)
+}
+requestAnimationFrame(gameLoop);
+</script>
+</html>
