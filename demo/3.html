@@ -1,0 +1,151 @@
+<html>
+<head>
+<style>
+body {
+    background-color: #f0f0f0; /* Nicht weißer Hintergrund */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#game {
+    background-color: white; /* Weißer Canvas-Hintergrund */
+    border: 1px solid black; /* Optional: Rahmen um den Canvas */
+}
+
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+</body>
+<script>
+
+canvas = document.getElementById("game")
+ctx = canvas.getContext("2d")
+canvas.width = 16*32*1.5
+canvas.height = 9*32*1.5
+gravity = .2
+
+rect1 = {
+	x: 50,
+	y: 70,
+	width: 50,
+	height: 50,
+	vx: 0,
+	vy: 0
+}
+
+rect2 = {
+	x: 300,
+	y: 150,
+	width: 50,
+	height: 50,
+	vx: 1,
+	vy: 0
+}
+
+canvas.addEventListener('mousemove', function(event) {
+	var pos = canvas.getBoundingClientRect()
+	rect1.x = event.clientX - pos.left - rect1.width/2
+	rect1.y = event.clientY - pos.top - rect1.height/2
+});
+
+canvas.addEventListener('mousedown', function(event) {
+	rect2.vy = -5
+});
+
+function drawRect(r1, r2){
+    ctx.beginPath()
+    ctx.strokeStyle = r1.y < r2.y + r2.height ? "blue" : "red"
+    ctx.moveTo(r1.x, r1.y)
+    ctx.lineTo(r1.x + r1.width, r1.y)
+    ctx.stroke()
+	
+    ctx.beginPath()
+    ctx.strokeStyle = r2.y < r1.y + r1.height ? "blue" : "red"
+    ctx.moveTo(r1.x, r1.y + r1.height)
+    ctx.lineTo(r1.x + r1.width, r1.y + r1.height)
+    ctx.stroke()
+	
+    ctx.beginPath()
+    ctx.strokeStyle = r1.x < r2.x + r2.width ? "blue" : "red"
+    ctx.moveTo(r1.x, r1.y)
+    ctx.lineTo(r1.x, r1.y + r1.height)
+    ctx.stroke()
+	
+    ctx.beginPath()
+    ctx.strokeStyle = r2.x < r1.x + r1.width ? "blue" : "red"
+    ctx.moveTo(r1.x + r1.width, r1.y)
+    ctx.lineTo(r1.x + r1.width, r1.y + r1.height)
+    ctx.stroke()
+}
+
+function drawGame(){
+	ctx.strokeStyle = "blue"
+	drawRect(rect1,rect2)
+	drawRect(rect2,rect1)
+	//ctx.strokeRect(rect1.x,rect1.y,rect1.width,rect1.height)
+	//ctx.strokeRect(rect2.x,rect2.y,rect2.width,rect2.height)
+	
+	ctx.font = '20px courier new'
+	
+	ctx.fillText("gravity: " + (gravity), 10, canvas.height - 30)
+	ctx.fillText("velocity y2: " + Math.round(rect2.vy), 10, canvas.height - 10)
+}
+
+function cubelogic(r, c){
+	r.y += r.vy
+	if(collisionBetween(r,c)){
+		if( r.vy > 0 ){
+			while(collisionBetween(r,c)){
+				r.y--
+			}
+		}
+		else{
+			while(collisionBetween(r,c)){
+				r.y++
+			}
+		}
+		r.vy = 0
+		r.vx *= .9
+	}
+	r.x += r.vx
+	if(collisionBetween(r,c)){
+		if( r.vx > 0 ){
+			while(collisionBetween(r,c)){
+				r.x--
+			}
+		}
+		else{
+			while(collisionBetween(r,c)){
+				r.x++
+			}
+		}
+		r.vx *= -1
+	}
+	
+	r.vy += gravity
+	if(r.y + r.height >= canvas.height){
+		while(r.y + r.height > canvas.height){
+			r.y--
+		}
+		r.vy = 0
+		r.vx *= .9
+	}
+}
+
+function collisionBetween(a, b){
+	return a.x < b.x + b.width && a.y < b.y + b.height && b.x < a.x + a.width && b.y < a.y + a.height
+}
+
+function gameLoop(timestamp) {
+	ctx.clearRect(0,0,canvas.width,canvas.height)
+	drawGame()
+	cubelogic(rect2, rect1)
+	requestAnimationFrame(gameLoop)
+}
+requestAnimationFrame(gameLoop);
+</script>
+</html>
