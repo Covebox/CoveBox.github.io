@@ -1,0 +1,446 @@
+<html>
+<head>
+<style>
+body {
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#game {
+    background-color: white;
+    border: 1px solid black;
+}
+
+canvas {
+  image-rendering: pixelated;
+}
+
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+</body>
+<script>
+var sprites = new Image()
+sprites.onload = function() {
+    this.isLoaded = true
+}
+sprites.src = "./59537.png"
+
+frame = 0
+score = 0
+drawHitboxes = false
+canRestart = false
+
+rects = []
+class Rect{
+	constructor(opt = {}){
+		this.x = 0
+		this.y = 0
+		this.width = 0
+		this.height = 0
+		this.vx = 0
+		this.vy = 0
+		this.ax = 0
+		this.ay = 0
+		this.fill = 0
+		this.type = "rect"
+		this.sprite = ""
+		this.deleteFlag = 0
+		
+		this.index = rects.length
+		rects.push(this)
+		this.targetIndex = 0
+		
+		this.readOpt(opt)
+	}
+	readOpt(opt = {}){
+		for( let key in opt ){
+			this[key] = opt[key]
+		}
+	}
+	tick(){
+		this.vx += this.ax
+		this.vy += this.ay
+		if( gameState != "end" ){
+			this.x += this.vx
+		}
+		this.y += this.vy
+		
+		if(this.type == "flappy"){		
+			if( this.hasCollisionWithType("pipe") ){
+				gameState = "end"
+				//this.fill = "red"
+			}	
+			if( this.hasCollisionWithSprite("boden") ){
+				canRestart = true
+				while( this.hasCollisionWithSprite("boden") ){
+					this.y--
+					this.ay = 0
+					this.vy = 0
+				}
+			}	
+		}
+		
+		if(this.type == "score"){		
+			if( this.hasCollisionWithType("flappy") ){
+				console.log("score")
+				score += 1
+				this.deleteFlag = 1
+			}	
+		}
+		
+		if(this.x+this.width < -10 && ( this.type == "pipe" ) ){
+			if( this.sprite == "boden" ){
+				this.x += this.width*3
+			}
+			else{
+				this.deleteFlag = 1
+			}
+		}
+		
+	}
+	draw(){
+		if( sprites.isLoaded ){
+			if( this.type == "flappy" ){
+				ctx.save()
+				ctx.translate(this.x+this.width/2, this.y+this.height/2)
+				var angle = this.vy*5
+				ctx.rotate(angle * Math.PI / 180)
+				if( (frame/5) % 3 < 1){
+					ctx.drawImage(sprites, 264*4, 64*4, 18*4, 14*4, -this.width/2-10, -this.height/2-5, 18*4, 14*4)
+				}
+				else if((frame/5) % 3 < 2){
+					ctx.drawImage(sprites, 264*4, 90*4, 18*4, 14*4, -this.width/2-10, -this.height/2-5, 18*4, 14*4)
+				}
+				else{
+					ctx.drawImage(sprites, 223*4, 124*4, 18*4, 14*4, -this.width/2-10, -this.height/2-5, 18*4, 14*4)
+				}
+				ctx.restore()				
+			}
+			if( this.sprite == "toppipe" ){
+				ctx.drawImage(sprites, 302*4, 0*4, 26*4, 135*4, Math.round(this.x), Math.round(this.height)-135*4, 26*4, 135*4)
+			}
+			if( this.sprite == "bottompipe" ){
+				ctx.drawImage(sprites, 330*4, 0*4, 26*4, 121*4, Math.round(this.x), Math.round(this.y), 26*4, 121*4)
+			}
+			if( this.sprite == "boden" ){
+				ctx.drawImage(sprites, 146*4, 0*4, 154*4, 56*4, Math.round(this.x), Math.round(this.y), 154*4, 56*4)
+			}
+		}
+	
+		if( this.fill ){
+			ctx.fillStyle = this.fill
+			ctx.fillRect(this.x, this.y, this.width, this.height)
+		}
+		if(drawHitboxes){
+			var r1 = this
+			var r2 = rects[this.targetIndex]
+			
+			ctx.beginPath()
+			ctx.strokeStyle = r1.y < r2.y + r2.height ? "blue" : "red"
+			ctx.moveTo(r1.x, r1.y)
+			ctx.lineTo(r1.x + r1.width, r1.y)
+			ctx.stroke()
+			
+			ctx.beginPath()
+			ctx.strokeStyle = r2.y < r1.y + r1.height ? "blue" : "red"
+			ctx.moveTo(r1.x, r1.y + r1.height)
+			ctx.lineTo(r1.x + r1.width, r1.y + r1.height)
+			ctx.stroke()
+			
+			ctx.beginPath()
+			ctx.strokeStyle = r1.x < r2.x + r2.width ? "blue" : "red"
+			ctx.moveTo(r1.x, r1.y)
+			ctx.lineTo(r1.x, r1.y + r1.height)
+			ctx.stroke()
+			
+			ctx.beginPath()
+			ctx.strokeStyle = r2.x < r1.x + r1.width ? "blue" : "red"
+			ctx.moveTo(r1.x + r1.width, r1.y)
+			ctx.lineTo(r1.x + r1.width, r1.y + r1.height)
+			ctx.stroke()
+		}
+	}
+	hasCollisionWith(rect){
+		return this.x < rect.x + rect.width && this.y < rect.y + rect.height && rect.x < this.x + this.width && rect.y < this.y + this.height
+	}
+	hasCollisionWithType(type){
+		for(var rect of rects){
+			if( rect.type == type && this.hasCollisionWith(rect) ){
+				return true
+			}
+		}
+		return false
+	}
+	hasCollisionWithSprite(type){
+		for(var rect of rects){
+			if( rect.sprite == type && this.hasCollisionWith(rect) ){
+				return true
+			}
+		}
+		return false
+	}
+	remove(){
+		for( var index in rects ){
+			if( rects[index] == this ){
+				rects.splice(index, 1)
+			}
+		}
+	}
+}
+
+
+canvas = document.getElementById("game")
+ctx = canvas.getContext("2d")
+ctx.imageSmoothingEnabled = false;
+canvas.width = 16*32*1.5
+canvas.height = 9*32*1.5
+gravity = .2
+
+gameState = "init"
+_lastGameState = gameState
+pipeIntervalIndex = 0
+function handleGamestateChange(){
+	if(_lastGameState != gameState ){
+		// Gamestate Change:
+		if( gameState == "start" ){
+			pipeIntervalIndex = setInterval(spawnPipe, 2500)
+			spawnPipe()
+		}
+	}
+	_lastGameState = gameState
+}
+
+
+rect2 = new Rect({
+	x: 300,
+	y: 150,
+	width: 50,
+	height: 40,
+	vx: 0,
+	vy: 0,
+	ay: .2,
+	type: "flappy"
+})
+
+rect1 = new Rect({
+	x: 50,
+	y: 70,
+	width: 50,
+	height: 50,
+	vx: 0,
+	vy: 0
+})
+new Rect({
+	x: 0,
+	y: canvas.height-18,
+	width: 154*4,
+	height: 10,
+	vx: -3,
+	vy: 0,
+	type: "pipe",
+	sprite: "boden"
+})
+new Rect({
+	x: 154*4,
+	y: canvas.height-18,
+	width: 154*4,
+	height: 10,
+	vx: -3,
+	vy: 0,
+	type: "pipe",
+	sprite: "boden"
+})
+new Rect({
+	x: 154*4*2,
+	y: canvas.height-18,
+	width: 154*4,
+	height: 10,
+	vx: -3,
+	vy: 0,
+	type: "pipe",
+	sprite: "boden"
+})
+
+rect1.targetIndex = rect2.index
+
+
+
+canvas.addEventListener('mousemove', function(event) {
+	var pos = canvas.getBoundingClientRect()
+	rect1.x = event.clientX - pos.left - rect1.width/2
+	rect1.y = event.clientY - pos.top - rect1.height/2
+});
+
+canvas.addEventListener('mousedown', function(event) {
+	if( gameState == "init" ){
+		gameState = "start"
+	}
+	if( gameState != "end" ){
+		rect2.vy = -5
+	}
+	if(	canRestart == true ){
+		canRestart = false
+		restart()
+	}
+	return false
+});
+
+function drawGame(){
+	drawBackground()
+	rects.reverse().forEach(e => e.draw())
+	rects.reverse()
+	ctx.font = '20px courier new'
+	ctx.fillStyle = "black"
+	ctx.fillText("score: " + Math.round(score), 9, canvas.height - 19)
+	ctx.fillText("score: " + Math.round(score), 9, canvas.height - 21)
+	ctx.fillText("score: " + Math.round(score), 11, canvas.height - 19)
+	ctx.fillText("score: " + Math.round(score), 11, canvas.height - 21)
+	ctx.fillStyle = "white"
+	ctx.fillText("score: " + Math.round(score), 10, canvas.height - 20)
+}
+
+var bgpanels = [0,138*4,138*4*2]
+function drawBackground(){
+	for(var i in bgpanels){
+		if(bgpanels[i] < -138*4){
+			bgpanels[i] += 138*3*4
+		}
+		if(gameState != "end"){
+			bgpanels[i] -= 2
+		}
+		ctx.drawImage(sprites, 0, 0, 144*4, 256*4, bgpanels[i], -256*2, 144*4, 256*4)
+	}
+}
+
+function spawnPipe(){
+	var lucke = Math.random()*(canvas.height-200)+200
+	var luckebreite = 180
+	new Rect({
+		x: canvas.width+50,
+		y: lucke-luckebreite,
+		width: 50,
+		height: luckebreite,
+		vx: -3,
+		vy: 0,
+		type: "score"
+	})
+	new Rect({
+		x: canvas.width,
+		y: lucke,
+		width: 26*4,
+		height: canvas.height,
+		vx: -3,
+		vy: 0,
+		type: "pipe",
+		sprite: "bottompipe"
+	})
+	new Rect({
+		x: canvas.width,
+		y: 0,
+		width: 26*4,
+		height: lucke-luckebreite,
+		vx: -3,
+		vy: 0,
+		type: "pipe",
+		sprite: "toppipe"
+	})
+}
+
+
+function collisionBetween(a, b){
+	return a.x < b.x + b.width && a.y < b.y + b.height && b.x < a.x + a.width && b.y < a.y + a.height
+}
+
+function deleteFlagHandler(){
+	for( var index in rects ){
+		if( rects[index].deleteFlag > 0){
+			rects[index].remove()
+		}
+	}
+}
+
+function gameLoop(timestamp) {
+	ctx.clearRect(0,0,canvas.width,canvas.height)
+	if(gameState == "start" || gameState == "end"){
+		rects.forEach(e => e.tick())
+	}
+	drawGame()
+	requestAnimationFrame(gameLoop)
+	handleGamestateChange()
+	deleteFlagHandler()
+	if(gameState != "end"){
+		frame++
+	}
+}
+requestAnimationFrame(gameLoop);
+
+function restart(){
+	clearInterval(pipeIntervalIndex)
+	frame = 0
+	score = 0
+	drawHitboxes = false
+	canRestart = false
+	gameState = "init"
+	_lastGameState = gameState
+	
+	rects = []
+	
+	rect2 = new Rect({
+		x: 300,
+		y: 150,
+		width: 50,
+		height: 40,
+		vx: 0,
+		vy: 0,
+		ay: .2,
+		type: "flappy"
+	})
+
+	rect1 = new Rect({
+		x: 50,
+		y: 70,
+		width: 50,
+		height: 50,
+		vx: 0,
+		vy: 0
+	})
+	new Rect({
+		x: 0,
+		y: canvas.height-18,
+		width: 154*4,
+		height: 10,
+		vx: -3,
+		vy: 0,
+		type: "pipe",
+		sprite: "boden"
+	})
+	new Rect({
+		x: 154*4,
+		y: canvas.height-18,
+		width: 154*4,
+		height: 10,
+		vx: -3,
+		vy: 0,
+		type: "pipe",
+		sprite: "boden"
+	})
+	new Rect({
+		x: 154*4*2,
+		y: canvas.height-18,
+		width: 154*4,
+		height: 10,
+		vx: -3,
+		vy: 0,
+		type: "pipe",
+		sprite: "boden"
+	})
+
+}
+</script>
+</html>
