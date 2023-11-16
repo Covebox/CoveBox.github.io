@@ -288,7 +288,12 @@ canvas.addEventListener('mousedown', function(event) {
 		canRestart = false
 		restart()
 	}
+    event.preventDefault();
 	return false
+});
+
+canvas.addEventListener('touchstart', function(event) {
+    event.preventDefault();
 });
 
 function drawGame(){
