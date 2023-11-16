@@ -34,6 +34,7 @@ sprites.src = "./59537.png"
 frame = 0
 score = 0
 drawHitboxes = false
+canRestart = false
 
 rects = []
 class Rect{
@@ -76,6 +77,7 @@ class Rect{
 				//this.fill = "red"
 			}	
 			if( this.hasCollisionWithSprite("boden") ){
+				canRestart = true
 				while( this.hasCollisionWithSprite("boden") ){
 					this.y--
 					this.ay = 0
@@ -202,15 +204,12 @@ gravity = .2
 
 gameState = "init"
 _lastGameState = gameState
+pipeIntervalIndex = 0
 function handleGamestateChange(){
 	if(_lastGameState != gameState ){
 		// Gamestate Change:
 		if( gameState == "start" ){
-			setInterval(spawnPipe, 2500)
-			spawnPipe()
-		}
-		if( gameState == "end" ){
-			setInterval(spawnPipe, 2500)
+			pipeIntervalIndex = setInterval(spawnPipe, 2500)
 			spawnPipe()
 		}
 	}
@@ -285,6 +284,10 @@ canvas.addEventListener('mousedown', function(event) {
 	if( gameState != "end" ){
 		rect2.vy = -5
 	}
+	if(	canRestart == true ){
+		canRestart = false
+		restart()
+	}
 	return false
 });
 
@@ -313,7 +316,6 @@ function drawBackground(){
 		}
 		ctx.drawImage(sprites, 0, 0, 144*4, 256*4, bgpanels[i], -256*2, 144*4, 256*4)
 	}
-	console.log(bgpanels)
 }
 
 function spawnPipe(){
@@ -377,5 +379,68 @@ function gameLoop(timestamp) {
 	}
 }
 requestAnimationFrame(gameLoop);
+
+function restart(){
+	clearInterval(pipeIntervalIndex)
+	frame = 0
+	score = 0
+	drawHitboxes = false
+	canRestart = false
+	gameState = "init"
+	_lastGameState = gameState
+	
+	rects = []
+	
+	rect2 = new Rect({
+		x: 300,
+		y: 150,
+		width: 50,
+		height: 40,
+		vx: 0,
+		vy: 0,
+		ay: .2,
+		type: "flappy"
+	})
+
+	rect1 = new Rect({
+		x: 50,
+		y: 70,
+		width: 50,
+		height: 50,
+		vx: 0,
+		vy: 0
+	})
+	new Rect({
+		x: 0,
+		y: canvas.height-18,
+		width: 154*4,
+		height: 10,
+		vx: -3,
+		vy: 0,
+		type: "pipe",
+		sprite: "boden"
+	})
+	new Rect({
+		x: 154*4,
+		y: canvas.height-18,
+		width: 154*4,
+		height: 10,
+		vx: -3,
+		vy: 0,
+		type: "pipe",
+		sprite: "boden"
+	})
+	new Rect({
+		x: 154*4*2,
+		y: canvas.height-18,
+		width: 154*4,
+		height: 10,
+		vx: -3,
+		vy: 0,
+		type: "pipe",
+		sprite: "boden"
+	})
+
+}
 </script>
 </html>
