@@ -293,6 +293,16 @@ canvas.addEventListener('mousedown', function(event) {
 });
 
 canvas.addEventListener('touchstart', function(event) {
+	if( gameState == "init" ){
+		gameState = "start"
+	}
+	if( gameState != "end" ){
+		rect2.vy = -5
+	}
+	if(	canRestart == true ){
+		canRestart = false
+		restart()
+	}
     event.preventDefault();
 });
 canvas.addEventListener('touchmove', function(event) {
