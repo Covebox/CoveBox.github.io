@@ -1,0 +1,552 @@
+<html>
+<head>
+<style>
+body {
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#game {
+    background-color: white;
+    border: 1px solid black;
+}
+
+canvas {
+  image-rendering: pixelated;
+}
+
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+</body>
+<script>
+rects = []
+drawHitboxes = true
+cursor = {x:0, y:0}
+class Rect{
+	constructor(opt = {}){
+		this.x = 0
+		this.y = 0
+		this.width = 0
+		this.height = 0
+		this.vx = 0
+		this.vy = 0
+		this.ax = 0
+		this.ay = 0
+		this.fill = 0
+		this.type = "rect"
+		this.sprite = ""
+		this.deleteFlag = 0
+		
+		this.index = rects.length
+		rects.push(this)
+		this.targetIndex = 0
+		
+		//////////////////////////
+		this.readOpt(opt)
+		
+		this.wegpunktX = this.x
+		this.wegpunktY = this.y
+	}
+	readOpt(opt = {}){
+		for( let key in opt ){
+			this[key] = opt[key]
+		}
+	}
+	tick(){
+		var tile = this.getTile(grid)
+		var distanz = grid.getDistanzTile(tile.x,tile.y)
+		
+		if( distanz > grid.getDistanzTile(tile.x+1,tile.y) ){			
+			this.wegpunktX = this.x + 50
+			this.wegpunktY = this.y
+		}
+		else if( distanz > grid.getDistanzTile(tile.x-1,tile.y) ){
+			this.wegpunktX = this.x - 50
+			this.wegpunktY = this.y
+		}
+		else if( distanz > grid.getDistanzTile(tile.x,tile.y+1) ){
+			this.wegpunktX = this.x
+			this.wegpunktY = this.y + 50
+		}
+		else if( distanz > grid.getDistanzTile(tile.x,tile.y-1) ){
+			this.wegpunktX = this.x
+			this.wegpunktY = this.y - 50
+		}
+		
+		this.wegpunktX = (Math.floor(this.wegpunktX/grid.fliesengroesse)+.5)*grid.fliesengroesse
+		this.wegpunktY = (Math.floor(this.wegpunktY/grid.fliesengroesse)+.5)*grid.fliesengroesse
+		
+		this.vx = 0
+		this.vy = 0
+		
+		if( this.wegpunktX-2 > this.x ){
+			this.vx += 2
+		}
+		if( this.wegpunktX+2 < this.x ){
+			this.vx -= 2
+		}
+		if( this.wegpunktY-2 > this.y ){
+			this.vy += 2
+		}
+		if( this.wegpunktY+2 < this.y ){
+			this.vy -= 2
+		}
+		
+		this.moveAndSlide()
+		
+	}
+	moveAndSlide(){
+		this.x += this.vx
+		if( this.hasCollisionWithOtherRect() ){
+			if(this.vx > 0){
+				while( this.hasCollisionWithOtherRect() ){
+					this.x--
+				}
+			}
+			else{
+				while( this.hasCollisionWithOtherRect() ){
+					this.x++
+				}
+			}
+		}
+		this.y += this.vy
+		if( this.hasCollisionWithOtherRect() ){
+			if(this.vy > 0){
+				while( this.hasCollisionWithOtherRect() ){
+					this.y--
+				}
+			}
+			else{
+				while( this.hasCollisionWithOtherRect() ){
+					this.y++
+				}
+			}
+		}
+	}
+	hasCollisionWithOtherRect(){
+		for(var rect of rects){
+			if(rect != this){
+				if( this.hasCollisionWith(rect) ){
+					return true
+				}
+			}
+		}
+		if(grid.tileInPos(this.x, this.y) == 1){
+			return true
+		}
+		if(grid.tileInPos(this.x+this.width, this.y) == 1){
+			return true
+		}
+		if(grid.tileInPos(this.x, this.y+this.height) == 1){
+			return true
+		}
+		if(grid.tileInPos(this.x+this.width, this.y+this.height) == 1){
+			return true
+		}
+		return false
+	}
+	draw(){
+		if( this.fill ){
+			ctx.fillStyle = this.fill
+			ctx.fillRect(this.x, this.y, this.width, this.height)
+		}
+		if(drawHitboxes){
+			var r1 = this
+			var r2 = rects[this.targetIndex]
+			
+			ctx.beginPath()
+			ctx.strokeStyle = r1.y < r2.y + r2.height ? "blue" : "red"
+			ctx.moveTo(r1.x, r1.y)
+			ctx.lineTo(r1.x + r1.width, r1.y)
+			ctx.stroke()
+			
+			ctx.beginPath()
+			ctx.strokeStyle = r2.y < r1.y + r1.height ? "blue" : "red"
+			ctx.moveTo(r1.x, r1.y + r1.height)
+			ctx.lineTo(r1.x + r1.width, r1.y + r1.height)
+			ctx.stroke()
+			
+			ctx.beginPath()
+			ctx.strokeStyle = r1.x < r2.x + r2.width ? "blue" : "red"
+			ctx.moveTo(r1.x, r1.y)
+			ctx.lineTo(r1.x, r1.y + r1.height)
+			ctx.stroke()
+			
+			ctx.beginPath()
+			ctx.strokeStyle = r2.x < r1.x + r1.width ? "blue" : "red"
+			ctx.moveTo(r1.x + r1.width, r1.y)
+			ctx.lineTo(r1.x + r1.width, r1.y + r1.height)
+			ctx.stroke()
+		}
+	}
+	hasCollisionWith(rect){
+		return this.x < rect.x + rect.width && this.y < rect.y + rect.height && rect.x < this.x + this.width && rect.y < this.y + this.height
+	}
+	hasCollisionWithType(type){
+		for(var rect of rects){
+			if( rect.type == type && this.hasCollisionWith(rect) ){
+				return true
+			}
+		}
+		return false
+	}
+	hasCollisionWithSprite(type){
+		for(var rect of rects){
+			if( rect.sprite == type && this.hasCollisionWith(rect) ){
+				return true
+			}
+		}
+		return false
+	}
+	remove(){
+		for( var index in rects ){
+			if( rects[index] == this ){
+				rects.splice(index, 1)
+			}
+		}
+	}
+	
+	getTile(grid){
+		var fliese = {}
+		fliese.x = Math.floor(( this.x + this.width/2 - grid.ankerpunkt.x )/grid.fliesengroesse)
+		fliese.y = Math.floor(( this.y + this.height/2 - grid.ankerpunkt.y )/grid.fliesengroesse)
+		return fliese
+	}
+	
+}
+
+class Grid {
+    constructor(width, height) {
+        this.width = width;
+        this.height = height;
+        this.grid = this.createEmptyGrid();
+        this.distanzkarte = this.createEmptyGrid();
+		
+		this.ankerpunkt = {x: 10, y:7}
+		this.fliesengroesse = 30
+		
+		this.modus = 0
+		this.distanzkartenfillqueue = []
+		this.fillBucketClockedQueue = []
+		this.timerID = 0
+    }
+	
+	click(x,y){
+		if( this.modus == 0 ){
+			this.setTile(x,y,1)
+		}
+		if( this.modus == 1 ){
+			this.fillBucketClockedQueue.push({x,y})
+		}
+		if( this.modus == 2 ){
+			this.recursiveFill(x,y)
+		}
+		if( this.modus == 3 ){
+			this.distanzkartenfillqueue.push({x,y,distanz:0})
+		}
+		if( this.modus == 5 ){
+			this.setTile(x,y,0)
+		}
+	}
+	
+	createEmptyGrid() {
+        return new Array(this.height).fill(null).map(() => new Array(this.width).fill(0));
+    }
+	
+    draw(ctx) {
+		ctx.strokeStyle = "rgba(0,0,0,.1)"
+		var colors = ["white", "black", "blue", "green"]
+		
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+				if( colors.length > this.getTile(x,y)){
+					if( this.getTile(x,y) == 3 && this.distanzkarte[y][x] > 0 ){
+						var val = 255 - (this.distanzkarte[y][x] * 3)
+						if(val >= 0){
+							ctx.fillStyle = `rgb(${val},${val},${val})`
+						}
+					}
+					else{
+						ctx.fillStyle = colors[this.getTile(x,y)]
+					}
+					ctx.fillRect(x * this.fliesengroesse + this.ankerpunkt.x, y * this.fliesengroesse + this.ankerpunkt.y, this.fliesengroesse, this.fliesengroesse);
+				}
+            }
+        }
+		this.zeichneFillbucketqueue()
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+				if( this.distanzkarte[y][x] > 0 ){
+					ctx.fillStyle = "black"
+					ctx.textAlign = 'center'
+					ctx.fillText(this.distanzkarte[y][x], x * this.fliesengroesse + this.ankerpunkt.x + this.fliesengroesse/2, y * this.fliesengroesse + this.ankerpunkt.y+20)
+					ctx.fillText(this.distanzkarte[y][x], 1+ x * this.fliesengroesse + this.ankerpunkt.x + this.fliesengroesse/2, y * this.fliesengroesse + this.ankerpunkt.y+20)
+				}
+                ctx.strokeRect(x * this.fliesengroesse + this.ankerpunkt.x, y * this.fliesengroesse + this.ankerpunkt.y, this.fliesengroesse, this.fliesengroesse);
+            }
+        }
+    }
+
+	setTile(x,y,value){
+        if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
+		this.grid[y][x] = value
+	}
+	
+	getTile(x,y){
+        if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
+		return this.grid[y][x]
+	}
+
+	
+	fillbucketClock(){
+		if( this.fillBucketClockedQueue.length > 0 ){
+			var first = this.fillBucketClockedQueue.shift()
+			if(this.getTile(first.x, first.y) === 0){
+				this.setTile(first.x, first.y, 2)
+				this.fillBucketClockedQueue.push({x:first.x+1, y:first.y})
+				this.fillBucketClockedQueue.push({x:first.x, y:first.y+1})
+				this.fillBucketClockedQueue.push({x:first.x-1, y:first.y})
+				this.fillBucketClockedQueue.push({x:first.x, y:first.y-1})
+			}
+		}
+		if( this.distanzkartenfillqueue.length > 0 ){
+			var first = this.distanzkartenfillqueue.shift()
+			if(this.getTile(first.x, first.y) === 0){
+				this.setTile(first.x, first.y, 3)
+				this.distanzkarte[first.y][first.x] = first.distanz
+				this.distanzkartenfillqueue.push({x:first.x, y:first.y+1,distanz:first.distanz+1})
+				this.distanzkartenfillqueue.push({x:first.x+1, y:first.y,distanz:first.distanz+1})
+				this.distanzkartenfillqueue.push({x:first.x-1, y:first.y,distanz:first.distanz+1})
+				this.distanzkartenfillqueue.push({x:first.x, y:first.y-1,distanz:first.distanz+1})
+			}
+		}
+		if( this.modus == 4 ){
+			this.clear()
+			this.distanceMapFill(cursor.x, cursor.y)
+		}
+	}
+	
+	zeichneFillbucketqueue(){
+		for( var q of this.fillBucketClockedQueue ){
+			var x = q.x
+			var y = q.y
+			ctx.fillStyle = "orange"
+			ctx.fillRect(7 + x * this.fliesengroesse + this.ankerpunkt.x, 7 + y * this.fliesengroesse + this.ankerpunkt.y, this.fliesengroesse - 14 , this.fliesengroesse - 14);
+		}
+		for( var q of this.distanzkartenfillqueue ){
+			var x = q.x
+			var y = q.y
+			ctx.fillStyle = "darkgreen"
+			ctx.fillRect(10 + x * this.fliesengroesse + this.ankerpunkt.x, 10 + y * this.fliesengroesse + this.ankerpunkt.y, this.fliesengroesse - 20 , this.fliesengroesse - 20);
+		}
+	}
+	
+	startTimer(){
+		if( this.timerID == 0 ){
+			this.timerID = setInterval(function(e){e.fillbucketClock()}, 16, this)
+		}
+	}
+	
+	stopTimer(){
+		clearInterval(this.timerID)
+		this.timerID = 0
+	}
+	
+	recursiveFill(x,y){
+		this.setTile(x,y,2)
+		if(this.getTile(x+1,y) == 0){
+			this.recursiveFill(x+1,y)
+		}
+		if(this.getTile(x-1,y) == 0){
+			this.recursiveFill(x-1,y)
+		}
+		if(this.getTile(x,y+1) == 0){
+			this.recursiveFill(x,y+1)
+		}
+		if(this.getTile(x,y-1) == 0){
+			this.recursiveFill(x,y-1)
+		}
+	}	
+	
+	distanceMapFill(x,y,distanz=0){
+		this.distanzkartenfillqueue.push({x, y,distanz:distanz})
+		while(this.distanzkartenfillqueue.length > 0){
+			var first = this.distanzkartenfillqueue.shift()
+			if(this.getTile(first.x, first.y) === 0){
+				this.setTile(first.x, first.y, 3)
+				this.distanzkarte[first.y][first.x] = first.distanz
+				
+				this.distanzkartenfillqueue.push({ x:first.x+1 , y:first.y   , distanz:first.distanz+1 })
+				this.distanzkartenfillqueue.push({ x:first.x   , y:first.y+1 , distanz:first.distanz+1 })
+				this.distanzkartenfillqueue.push({ x:first.x-1 , y:first.y   , distanz:first.distanz+1 })
+				this.distanzkartenfillqueue.push({ x:first.x   , y:first.y-1 , distanz:first.distanz+1 })
+			}
+		}
+	}
+	
+	clear(){
+		this.distanzkartenfillqueue = []
+		this.fillBucketClockedQueue = []
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+				if( this.getTile(x,y) != 1 ){
+					this.setTile(x,y,0)
+				}
+				if( this.distanzkarte[y][x] > 0 ){
+					this.distanzkarte[y][x] = 0
+				}
+            }
+        }
+	}
+	
+	getDistanzTile(x, y){
+		if( x < 0 || y < 0 | x >= this.width || y >= this.height ) return;
+		if(this.getTile(x,y) == 1) return 999
+		return this.distanzkarte[y][x]
+	}
+	
+	tileInPos(x, y){
+		var fliese = {}
+		fliese.x = Math.floor(( x - this.ankerpunkt.x )/this.fliesengroesse)
+		fliese.y = Math.floor(( y - grid.ankerpunkt.y )/this.fliesengroesse)
+		return this.getTile(fliese.x, fliese.y)
+	}
+}
+
+
+
+canvas = document.getElementById("game")
+ctx = canvas.getContext("2d")
+ctx.imageSmoothingEnabled = false;
+canvas.width = 16*32*1.5
+canvas.height = 9*32*1.5
+
+const grid = new Grid(25, 14); // Beispielgröße
+
+gameState = "init"
+_lastGameState = gameState
+
+rect2 = new Rect({
+	x: canvas.width/2-10,
+	y: canvas.height/2-10,
+	width: 20,
+	height: 20,
+	fill: "lime"
+})
+for(var i = 0; i < 0; i++){
+	new Rect({
+		x: canvas.width/2-10,
+		y: canvas.height/2-10,
+		width: 20,
+		height: 20,
+		fill: "lime"
+	})
+}
+/*
+rect1 = new Rect({
+	x: 50,
+	y: 70,
+	width: 50,
+	height: 50
+})*/
+
+//rect1.targetIndex = rect2.index
+
+canvas.addEventListener('click', function(event) {
+    const rect = canvas.getBoundingClientRect()
+    const x = Math.floor((event.clientX - rect.left - grid.ankerpunkt.x)/grid.fliesengroesse)
+    const y = Math.floor((event.clientY - rect.top - grid.ankerpunkt.y)/grid.fliesengroesse)
+	grid.click(x,y)
+})
+
+document.addEventListener('keydown', function(event) {
+    if(event.key === "0"){
+		grid.modus = 0
+	}
+    if(event.key == 1){
+		grid.modus = 1
+	}
+    if(event.key == 2){
+		grid.modus = 2
+	}
+    if(event.key == 3){
+		grid.modus = 3
+	}
+    if(event.key == 5){
+		grid.modus = 5
+	}
+	if(event.key === " "){
+		grid.fillbucketClock()
+	}
+	if(event.key === "."){
+		if(grid.timerID){
+			grid.stopTimer()
+		}
+		else{
+			grid.startTimer()
+		}
+	}
+    if(event.key == 4){
+		grid.modus = 4
+		grid.startTimer()
+	}
+    if(event.key == 9){
+		grid.clear()
+	}
+})
+
+canvas.addEventListener('mousemove', function(event) {
+	var pos = canvas.getBoundingClientRect()
+	//rect1.x = event.clientX - pos.left - rect1.width/2
+	//rect1.y = event.clientY - pos.top - rect1.height/2
+	
+	cursor.x = Math.floor(( event.clientX - pos.left - grid.ankerpunkt.x ) / grid.fliesengroesse)
+	cursor.y = Math.floor(( event.clientY - pos.top - grid.ankerpunkt.y ) / grid.fliesengroesse)
+})
+
+function drawGame(){
+	grid.draw(ctx);
+	rects.forEach(e => e.draw())
+	ctx.fillStyle = "black"
+	ctx.textAlign = 'left'
+	ctx.font = '20px courier new'
+	var namen = [
+		"0 - Färben",
+		"1 - Clocked FillBucket",
+		"2 - Normal FillBucket",
+		"3 - Distanzkarte",
+		"4 - Maus ist Ziel",
+		"5 - Radierer",
+	]
+	ctx.fillText("modus: " + namen[grid.modus], 20, canvas.height - 20)
+}
+
+function collisionBetween(a, b){
+	return a.x < b.x + b.width && a.y < b.y + b.height && b.x < a.x + a.width && b.y < a.y + a.height
+}
+
+function deleteFlagHandler(){
+	for( var index in rects ){
+		if( rects[index].deleteFlag > 0){
+			rects[index].remove()
+		}
+	}
+}
+
+function gameLoop(timestamp) {
+	ctx.clearRect(0,0,canvas.width,canvas.height)
+	rects.forEach(e => e.tick())
+	drawGame()
+	requestAnimationFrame(gameLoop)
+	deleteFlagHandler()
+}
+requestAnimationFrame(gameLoop);
+
+</script>
+</html>
