@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ELO Rating System</title>
+    <script>
+        class EloRating {
+            constructor(k = 32) {
+                this.k = k;
+            }
+
+            getExpectedScore(ra, rb) {
+                return 1 / (1 + Math.pow(10, (rb - ra) / 400));
+            }
+
+            getNewRating(ra, rb, result) {
+                const expectedScore = this.getExpectedScore(ra, rb);
+                return ra + this.k * (result - expectedScore);
+            }
+        }
+
+        class Item {
+            constructor(name) {
+                this.name = name;
+                this.rating = 1000; // Startwert
+            }
+        }
+
+        let items = [
+            new Item("Item 1"),
+            new Item("Item 2"),
+            new Item("Item 3"),
+            new Item("Item 4"),
+            new Item("Item 5"),
+            // Fügen Sie weitere Items hinzu...
+        ];
+
+        let currentPair = [];
+
+        function getRandomItems(items) {
+            const shuffled = [...items].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, 2);
+        }
+
+        function updateDisplay() {
+            document.getElementById('option1').textContent = currentPair[0].name + " - Rating: " + currentPair[0].rating;
+            document.getElementById('option2').textContent = currentPair[1].name + " - Rating: " + currentPair[1].rating;
+        }
+
+        function chooseItem(winnerIndex) {
+            const elo = new EloRating();
+            const loserIndex = winnerIndex === 0 ? 1 : 0;
+
+            currentPair[winnerIndex].rating = elo.getNewRating(currentPair[winnerIndex].rating, currentPair[loserIndex].rating, 1);
+            currentPair[loserIndex].rating = elo.getNewRating(currentPair[loserIndex].rating, currentPair[winnerIndex].rating, 0);
+
+            // Aktualisieren Sie die Ratings in der Item-Liste
+            items = items.map(item => {
+                if (item.name === currentPair[0].name) {
+                    return currentPair[0];
+                } else if (item.name === currentPair[1].name) {
+                    return currentPair[1];
+                }
+                return item;
+            });
+
+			console.log(items.map(e=>e.rating))
+
+            // Wählen Sie zwei neue Items für die nächste Auswahl
+            currentPair = getRandomItems(items);
+            updateDisplay();
+        }
+
+        window.onload = () => {
+            currentPair = getRandomItems(items);
+            updateDisplay();
+        };
+    </script>
+</head>
+<body>
+    <h1>ELO Rating System</h1>
+    <div>
+        <button id="option1" onclick="chooseItem(0)">Wählen</button>
+        <button id="option2" onclick="chooseItem(1)">Wählen</button>
+    </div>
+</body>
+</html>
