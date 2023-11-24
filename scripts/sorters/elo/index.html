@@ -25,14 +25,10 @@
             }
         }
 
-        let items = [
-            new Item("Item 1"),
-            new Item("Item 2"),
-            new Item("Item 3"),
-            new Item("Item 4"),
-            new Item("Item 5"),
-            // Fügen Sie weitere Items hinzu...
-        ];
+        let items = []
+		for(var i = 1; i <= 707; i++ ){
+			items.push(new Item("./naidesu/"+i+".png"))
+		}
 
         let currentPair = [];
 
@@ -42,7 +38,10 @@
         }
 
         function updateDisplay() {
+            document.getElementById('img1').src = currentPair[0].name
             document.getElementById('option1').textContent = currentPair[0].name + " - Rating: " + currentPair[0].rating;
+			
+            document.getElementById('img2').src = currentPair[1].name
             document.getElementById('option2').textContent = currentPair[1].name + " - Rating: " + currentPair[1].rating;
         }
 
@@ -79,7 +78,10 @@
 <body>
     <h1>ELO Rating System</h1>
     <div>
+        <img id="img1" onclick="chooseItem(0)">
         <button id="option1" onclick="chooseItem(0)">Wählen</button>
+        
+		<img id="img2" onclick="chooseItem(1)">
         <button id="option2" onclick="chooseItem(1)">Wählen</button>
     </div>
 </body>
