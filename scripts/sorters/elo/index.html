@@ -2,6 +2,16 @@
 <html>
 <head>
     <title>ELO Rating System</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+        }
+    </style>
     <script>
         class EloRating {
             constructor(k = 32) {
@@ -38,11 +48,24 @@
         }
 
         function updateDisplay() {
-            document.getElementById('img1').src = currentPair[0].name
+document.getElementById('img1').src = currentPair[0].name
             document.getElementById('option1').textContent = currentPair[0].name + " - Rating: " + currentPair[0].rating;
-			
+
             document.getElementById('img2').src = currentPair[1].name
             document.getElementById('option2').textContent = currentPair[1].name + " - Rating: " + currentPair[1].rating;
+            updateRankingTable();
+        }
+
+        function updateRankingTable() {
+            const table = document.getElementById('rankingTable');
+            table.innerHTML = "<tr><th>Name</th><th>Rating</th></tr>"; // Kopfzeile der Tabelle
+            items.sort((a, b) => b.rating - a.rating).forEach(item => {
+                const row = table.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                cell1.textContent = item.name;
+                cell2.textContent = item.rating.toFixed(2);
+            });
         }
 
         function chooseItem(winnerIndex) {
@@ -78,11 +101,15 @@
 <body>
     <h1>ELO Rating System</h1>
     <div>
-        <img id="img1" onclick="chooseItem(0)">
+<img id="img1" onclick="chooseItem(0)">
         <button id="option1" onclick="chooseItem(0)">Wählen</button>
-        
+
 		<img id="img2" onclick="chooseItem(1)">
         <button id="option2" onclick="chooseItem(1)">Wählen</button>
     </div>
+    <h2>Aktuelles Ranking:</h2>
+    <table id="rankingTable">
+        <!-- Die Tabelle wird durch JavaScript aktualisiert -->
+    </table>
 </body>
 </html>
