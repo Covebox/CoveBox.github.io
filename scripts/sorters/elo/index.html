@@ -113,6 +113,16 @@
             return [near1000, top25Item];
         }
 
+        function getSpecialPairTop50(items) {
+            const top50Percent = items.slice().sort((a, b) => b.rating - a.rating).slice(0, Math.floor(items.length * 0.5));
+            const item1 = top50Percent[Math.floor(Math.random() * top50Percent.length)];
+            let item2;
+            do {
+                item2 = top50Percent[Math.floor(Math.random() * top50Percent.length)];
+            } while (item1.id === item2.id); // Stellen Sie sicher, dass es nicht dasselbe Item ist
+            return [item1, item2];
+        }
+
         function chooseItem(winnerIndex) {
             const elo = new EloRating();
             const loserIndex = winnerIndex === 0 ? 1 : 0;
@@ -132,12 +142,14 @@
             saveItems();
 
             selectionCount++;
-            if (selectionCount % 15 === 5) {
+            if (selectionCount % 20 === 5) {
                 currentPair = getRandomSpecialPair(items);
-            } else if (selectionCount % 15 === 10) {
+            } else if (selectionCount % 20 === 10) {
                 currentPair = getSpecialPairNear1000(items);
-            } else if (selectionCount % 15 === 0) {
+            } else if (selectionCount % 20 === 15) {
                 currentPair = getSpecialPair1000VsTop25(items);
+            } else if (selectionCount % 20 === 0) {
+                currentPair = getSpecialPairTop50(items);
             } else {
                 currentPair = getRandomItems(items);
             }
