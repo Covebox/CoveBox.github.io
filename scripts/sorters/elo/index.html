@@ -26,9 +26,10 @@
             margin-bottom: 10px;
             cursor: pointer; /* Cursor ändern, um anzuzeigen, dass das Bild anklickbar ist */
         }
-		.table-img {
-			height: 500px;
-		}
+        .table-img {
+            height: 500px;
+            object-fit: cover;
+        }
     </style>
     <script>
         class EloRating {
@@ -58,6 +59,7 @@
         let items = [];
         const itemsCount = 707;
         let currentPair = [];
+        let selectionCount = 0;
 
         function loadItems() {
             const storedItems = localStorage.getItem('items');
@@ -76,34 +78,18 @@
             return shuffled.slice(0, 2);
         }
 
-        function updateDisplay() {
-            const [item1, item2] = currentPair;
-            document.getElementById('option1').textContent = item1.name + " - Rating: " + item1.rating.toFixed(2);
-            document.getElementById('option2').textContent = item2.name + " - Rating: " + item2.rating.toFixed(2);
-            const img1 = document.getElementById('img1');
-            const img2 = document.getElementById('img2');
-            img1.src = item1.imageUrl;
-            img2.src = item2.imageUrl;
-            img1.onclick = () => chooseItem(0); // onclick zum Bild hinzufügen
-            img2.onclick = () => chooseItem(1); // onclick zum Bild hinzufügen
-            updateRankingTable();
+        function getSpecialPairNear1000(items) {
+            const near1000 = items.slice().sort((a, b) => Math.abs(a.rating - 1000) - Math.abs(b.rating - 1000));
+            return near1000.slice(0, 2);
         }
 
-        function updateRankingTable() {
-            const table = document.getElementById('rankingTable');
-            table.innerHTML = "<tr><th>Bild</th><th>Name</th><th>Rating</th></tr>";
-            items.sort((a, b) => b.rating - a.rating).slice(0, 50).forEach(item => {
-                const row = table.insertRow();
-                const cellImg = row.insertCell(0);
-                const img = document.createElement('img');
-                img.src = item.imageUrl;
-                img.className = 'table-img';
-                cellImg.appendChild(img);
-                const cell1 = row.insertCell(1);
-                const cell2 = row.insertCell(2);
-                cell1.textContent = item.name;
-                cell2.textContent = item.rating.toFixed(2);
-            });
+        function getRandomSpecialPair(items) {
+            const sortedItems = [...items].sort((a, b) => a.rating - b.rating);
+            const lower10Percent = sortedItems.slice(0, Math.floor(sortedItems.length * 0.1));
+            const upper10Percent = sortedItems.slice(-Math.floor(sortedItems.length * 0.1));
+            const lowerItem = lower10Percent[Math.floor(Math.random() * lower10Percent.length)];
+            const upperItem = upper10Percent[Math.floor(Math.random() * upper10Percent.length)];
+            return [lowerItem, upperItem];
         }
 
         function chooseItem(winnerIndex) {
@@ -123,8 +109,47 @@
             });
 
             saveItems();
-            currentPair = getRandomItems(items);
+
+            selectionCount++;
+            if (selectionCount % 10 === 5) {
+                currentPair = getRandomSpecialPair(items);
+            } else if (selectionCount % 10 === 0) {
+                currentPair = getSpecialPairNear1000(items);
+            } else {
+                currentPair = getRandomItems(items);
+            }
+
             updateDisplay();
+        }
+
+        function updateDisplay() {
+            const [item1, item2] = currentPair;
+            document.getElementById('option1').textContent = item1.name + " - Rating: " + item1.rating.toFixed(2);
+            document.getElementById('option2').textContent = item2.name + " - Rating: " + item2.rating.toFixed(2);
+            const img1 = document.getElementById('img1');
+            const img2 = document.getElementById('img2');
+            img1.src = item1.imageUrl;
+            img2.src = item2.imageUrl;
+            img1.onclick = () => chooseItem(0);
+            img2.onclick = () => chooseItem(1);
+            updateRankingTable();
+        }
+
+        function updateRankingTable() {
+            const table = document.getElementById('rankingTable');
+            table.innerHTML = "<tr><th>Bild</th><th>Name</th><th>Rating</th></tr>";
+            items.sort((a, b) => b.rating - a.rating).slice(0, 20).forEach(item => {
+                const row = table.insertRow();
+                const cellImg = row.insertCell(0);
+                const img = document.createElement('img');
+                img.src = item.imageUrl;
+                img.className = 'table-img';
+                cellImg.appendChild(img);
+                const cell1 = row.insertCell(1);
+                const cell2 = row.insertCell(2);
+                cell1.textContent = item.name;
+                cell2.textContent = item.rating.toFixed(2);
+            });
         }
 
         window.onload = () => {
