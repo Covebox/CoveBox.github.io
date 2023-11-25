@@ -21,10 +21,10 @@
             text-align: center;
         }
         .item-img {
-            height: 800px; /* Größe der Bilder erhöht */
+            height: 800px;
             object-fit: cover;
             margin-bottom: 10px;
-            cursor: pointer; /* Cursor ändern, um anzuzeigen, dass das Bild anklickbar ist */
+            cursor: pointer;
         }
         .table-img {
             height: 500px;
@@ -62,9 +62,15 @@
         let selectionCount = 0;
 
         function loadItems() {
-            const storedItems = localStorage.getItem('items');
+            let storedItems = localStorage.getItem('items');
             if (storedItems) {
-                return JSON.parse(storedItems).map(item => new Item(item.id, item.rating));
+                storedItems = JSON.parse(storedItems);
+                if (storedItems.length < itemsCount) {
+                    for (let i = storedItems.length + 1; i <= itemsCount; i++) {
+                        storedItems.push(new Item(i));
+                    }
+                }
+                return storedItems.map(item => new Item(item.id, item.rating));
             }
             return Array.from({ length: itemsCount }, (_, i) => new Item(i + 1));
         }
@@ -74,8 +80,16 @@
         }
 
         function getRandomItems(items) {
-            const shuffled = [...items].sort(() => 0.5 - Math.random());
+            const shuffled = shuffleArray([...items]);
             return shuffled.slice(0, 2);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
         }
 
         function getSpecialPairNear1000(items) {
@@ -90,6 +104,13 @@
             const lowerItem = lower10Percent[Math.floor(Math.random() * lower10Percent.length)];
             const upperItem = upper10Percent[Math.floor(Math.random() * upper10Percent.length)];
             return [lowerItem, upperItem];
+        }
+
+        function getSpecialPair1000VsTop25(items) {
+            const near1000 = items.slice().sort((a, b) => Math.abs(a.rating - 1000) - Math.abs(b.rating - 1000))[0];
+            const top25Percent = items.slice().sort((a, b) => b.rating - a.rating).slice(0, Math.floor(items.length * 0.25));
+            const top25Item = top25Percent[Math.floor(Math.random() * top25Percent.length)];
+            return [near1000, top25Item];
         }
 
         function chooseItem(winnerIndex) {
@@ -111,10 +132,12 @@
             saveItems();
 
             selectionCount++;
-            if (selectionCount % 10 === 5) {
+            if (selectionCount % 15 === 5) {
                 currentPair = getRandomSpecialPair(items);
-            } else if (selectionCount % 10 === 0) {
+            } else if (selectionCount % 15 === 10) {
                 currentPair = getSpecialPairNear1000(items);
+            } else if (selectionCount % 15 === 0) {
+                currentPair = getSpecialPair1000VsTop25(items);
             } else {
                 currentPair = getRandomItems(items);
             }
