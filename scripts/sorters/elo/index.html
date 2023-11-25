@@ -57,7 +57,7 @@
         }
 
         let items = [];
-        const itemsCount = 707;
+        const itemsCount = 954;
         let currentPair = [];
         let selectionCount = 0;
 
@@ -161,7 +161,7 @@
         function updateRankingTable() {
             const table = document.getElementById('rankingTable');
             table.innerHTML = "<tr><th>Bild</th><th>Name</th><th>Rating</th></tr>";
-            items.sort((a, b) => b.rating - a.rating).slice(0, 20).forEach(item => {
+            items.sort((a, b) => b.rating - a.rating).slice(0, 50).forEach(item => {
                 const row = table.insertRow();
                 const cellImg = row.insertCell(0);
                 const img = document.createElement('img');
