@@ -113,8 +113,8 @@
             return [near1000, top25Item];
         }
 
-        function getSpecialPairTop50(items) {
-            const top50Percent = items.slice().sort((a, b) => b.rating - a.rating).slice(0, Math.floor(items.length * 0.5));
+        function getSpecialPairTop10(items) {
+            const top50Percent = items.slice().sort((a, b) => b.rating - a.rating).slice(0, 20);
             const item1 = top50Percent[Math.floor(Math.random() * top50Percent.length)];
             let item2;
             do {
@@ -142,14 +142,14 @@
             saveItems();
 
             selectionCount++;
-            if (selectionCount % 20 === 5) {
+            if (selectionCount % 10 === 2) {
                 currentPair = getRandomSpecialPair(items);
-            } else if (selectionCount % 20 === 10) {
+            } else if (selectionCount % 10 === 3) {
                 currentPair = getSpecialPairNear1000(items);
-            } else if (selectionCount % 20 === 15) {
+            } else if (selectionCount % 10 === 4) {
                 currentPair = getSpecialPair1000VsTop25(items);
-            } else if (selectionCount % 20 === 0) {
-                currentPair = getSpecialPairTop50(items);
+            } else if (selectionCount % 10 === 5) {
+                currentPair = getSpecialPairTop10(items);
             } else {
                 currentPair = getRandomItems(items);
             }
