@@ -21,11 +21,14 @@
             text-align: center;
         }
         .item-img {
-            height: 500px; /* Größe der Bilder erhöht */
+            height: 800px; /* Größe der Bilder erhöht */
             object-fit: cover;
             margin-bottom: 10px;
             cursor: pointer; /* Cursor ändern, um anzuzeigen, dass das Bild anklickbar ist */
         }
+		.table-img {
+			height: 500px;
+		}
     </style>
     <script>
         class EloRating {
@@ -53,7 +56,7 @@
         }
 
         let items = [];
-        const itemsCount = 701;
+        const itemsCount = 707;
         let currentPair = [];
 
         function loadItems() {
@@ -89,7 +92,7 @@
         function updateRankingTable() {
             const table = document.getElementById('rankingTable');
             table.innerHTML = "<tr><th>Bild</th><th>Name</th><th>Rating</th></tr>";
-            items.sort((a, b) => b.rating - a.rating).slice(0, 20).forEach(item => {
+            items.sort((a, b) => b.rating - a.rating).slice(0, 50).forEach(item => {
                 const row = table.insertRow();
                 const cellImg = row.insertCell(0);
                 const img = document.createElement('img');
