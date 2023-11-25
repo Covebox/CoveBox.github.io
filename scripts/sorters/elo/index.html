@@ -12,8 +12,11 @@
             text-align: left;
         }
         .item-img {
-            width: 150px;
-            height: 150px;
+            height: 200px;
+            object-fit: cover;
+        }
+        .table-img {
+            height: 50px;
             object-fit: cover;
         }
     </style>
@@ -65,11 +68,16 @@
 
         function updateRankingTable() {
             const table = document.getElementById('rankingTable');
-            table.innerHTML = "<tr><th>Name</th><th>Rating</th></tr>"; // Kopfzeile der Tabelle
-            items.sort((a, b) => b.rating - a.rating).forEach(item => {
+            table.innerHTML = "<tr><th>Bild</th><th>Name</th><th>Rating</th></tr>"; // Kopfzeile der Tabelle
+            items.sort((a, b) => b.rating - a.rating).slice(0, 20).forEach(item => { // Top 20 Items
                 const row = table.insertRow();
-                const cell1 = row.insertCell(0);
-                const cell2 = row.insertCell(1);
+                const cellImg = row.insertCell(0);
+                const img = document.createElement('img');
+                img.src = item.imageUrl;
+                img.className = 'table-img';
+                cellImg.appendChild(img);
+                const cell1 = row.insertCell(1);
+                const cell2 = row.insertCell(2);
                 cell1.textContent = item.name;
                 cell2.textContent = item.rating.toFixed(2);
             });
@@ -115,4 +123,5 @@
     <table id="rankingTable">
         <!-- Die Tabelle wird durch JavaScript aktualisiert -->
     </table>
-</body
+</body>
+</html>
