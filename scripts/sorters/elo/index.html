@@ -21,13 +21,10 @@
             text-align: center;
         }
         .item-img {
-            height: 500px;
+            height: 500px; /* Größe der Bilder erhöht */
             object-fit: cover;
             margin-bottom: 10px;
-        }
-        .table-img {
-            height: 50px;
-            object-fit: cover;
+            cursor: pointer; /* Cursor ändern, um anzuzeigen, dass das Bild anklickbar ist */
         }
     </style>
     <script>
@@ -80,8 +77,12 @@
             const [item1, item2] = currentPair;
             document.getElementById('option1').textContent = item1.name + " - Rating: " + item1.rating.toFixed(2);
             document.getElementById('option2').textContent = item2.name + " - Rating: " + item2.rating.toFixed(2);
-            document.getElementById('img1').src = item1.imageUrl;
-            document.getElementById('img2').src = item2.imageUrl;
+            const img1 = document.getElementById('img1');
+            const img2 = document.getElementById('img2');
+            img1.src = item1.imageUrl;
+            img2.src = item2.imageUrl;
+            img1.onclick = () => chooseItem(0); // onclick zum Bild hinzufügen
+            img2.onclick = () => chooseItem(1); // onclick zum Bild hinzufügen
             updateRankingTable();
         }
 
