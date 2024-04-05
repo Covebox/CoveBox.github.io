@@ -18,7 +18,7 @@
                 .then(function (response) {
                     // Daten verarbeiten und anzeigen
                     const container = document.getElementById('data-container');
-                    container.innerHTML = JSON.stringify(response.data, null, 2);
+                    container.innerHTML = response.data.eine_zahl //JSON.stringify(response.data, null, 2);
                 })
                 .catch(function (error) {
                     // Fehlerbehandlung
