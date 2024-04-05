@@ -1,0 +1,33 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test JSON anzeigen</title>
+</head>
+<body>
+    <h1>Daten aus JSON-Datei</h1>
+    <div id="data-container">
+        <!-- Hier werden die Daten eingefügt -->
+    </div>
+
+    <!-- Einbindung von Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // Funktion, um die Daten zu laden und anzuzeigen
+        function loadData() {
+            axios.get('../api/test.json')
+                .then(function (response) {
+                    // Daten verarbeiten und anzeigen
+                    const container = document.getElementById('data-container');
+                    container.innerHTML = JSON.stringify(response.data, null, 2);
+                })
+                .catch(function (error) {
+                    // Fehlerbehandlung
+                    console.log(error);
+                });
+        }
+
+        // Lade die Daten, sobald die Seite vollständig geladen ist
+        window.onload = loadData;
+    </script>
+</body>
+</html>
