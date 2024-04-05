@@ -21,8 +21,9 @@
                     container.innerHTML = ""                        //response.data.eine_zahl //JSON.stringify(response.data, null, 2);
                     for( var data of response.data ){
                         container.innerHTML += data.eine_zahl
-                        container.innerHTML += "\n"
+                        container.innerHTML += "</br>"
                     }
+
                 })
                 .catch(function (error) {
                     // Fehlerbehandlung
