@@ -1,4 +1,14 @@
-{
-    "hello": "world",
-    "eine_zahl": 7
-}
+[
+    {
+        "hello": "world",
+        "eine_zahl": 7
+    },
+    {
+        "metadata": "joe",
+        "eine_zahl": 54
+    },
+    {
+        "metadata": "joe2",
+        "eine_zahl": 154
+    }
+]
